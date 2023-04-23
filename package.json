@@ -1,0 +1,20 @@
+{
+  "name": "lipsurf-plugin-bunpro",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' lipsurf-cli build",
+    "watch": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' lipsurf-cli build --watch",
+    "version": "yarn clean && lipsurf-cli vup && cross-env NODE_ENV=production yarn build",
+    "clean": "rimraf -r dist/*"
+  },
+  "peerDependencies": {
+    "typescript": "4.x"
+  },
+  "devDependencies": {
+    "@lipsurf/cli": "^2.2.1",
+    "@lipsurf/types": "^2.1.1",
+    "@types/chrome": "~0.0.173",
+    "cross-env": "^7.0.3",
+    "rimraf": "^3.0.2"
+  }
+}
