@@ -30,10 +30,53 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
     return value !== null && value !== undefined;
 }
 
+function getTextFromRuby(ruby) {
+  const childNodes = Array.from(ruby.childNodes);
+  const textNodes = childNodes.filter(child => child.nodeType === Node.TEXT_NODE);
+  return textNodes.map(child => child.textContent).join('');
+}
+
+function getKanaFromRuby(ruby) {
+  const childNodes = Array.from(ruby.childNodes);
+  const textNodes = childNodes.filter(child => child.nodeName === 'RT');
+  return textNodes.map(child => child.textContent).join('');
+}
+
+function getText(div, rubyExtractor) {
+  const spans = Array.from(div.querySelectorAll('span'));
+  return spans.flatMap(function(span){
+    const childNodes = Array.from(span.childNodes);
+    return childNodes.map(function(child){
+      if (child.nodeType === Node.TEXT_NODE || child.nodeName === 'STRONG') {
+        return child.textContent;
+      } else if (child.nodeName === 'RUBY') {
+        return rubyExtractor(child);
+      } else {
+        console.log('[Bunpro.getText] unexpected child node: ', span, child);
+        return child.textContent;
+      }
+    });
+  }).join('');
+}
+
+function getTexts(div) {
+  return [getText(div, getTextFromRuby), getText(div, getKanaFromRuby)];
+}
+
+function getExampleSentences() {
+  const selector = 'div.example-sentence.japanese-example-sentence';
+  const nodes = Array.from(document.querySelectorAll(selector));
+  return nodes.flatMap(getTexts);
+}
+
 function getAnswers(): string[] {
-    return Array.from(document.querySelectorAll('#answer_in_kana'))
+    const official = Array.from(document.querySelectorAll('#answer_in_kana'))
         .map(answer => { return answer.getAttribute('data-answer'); })
         .filter(notEmpty);
+  const examples = getExampleSentences();
+  console.log('[Bunpro.getAnswers]', official);
+  console.log('[Bunpro.getAnswers]', examples);
+  return official.concat(examples);
 }
 
 export function matchAnswer({preTs, normTs}: TsData): [number, number, any[]?]|undefined|false {
