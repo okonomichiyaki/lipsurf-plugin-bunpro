@@ -70,9 +70,15 @@ function getExampleSentences() {
 }
 
 function getAnswers(): string[] {
-    const official = Array.from(document.querySelectorAll('#answer_in_kana'))
-        .map(answer => { return answer.getAttribute('data-answer'); })
-        .filter(notEmpty);
+  const official = Array.from(document.querySelectorAll('#quiz-metadata-element'))
+    .flatMap(metadata => {
+      const json = metadata.getAttribute('data-meta-answers-array');
+      if (json) {
+        return JSON.parse(json);
+      } else {
+        return [];
+      }
+    });
   const examples = getExampleSentences();
   console.log('[Bunpro.getAnswers]', official);
   console.log('[Bunpro.getAnswers]', examples);
@@ -100,12 +106,12 @@ function inputAnswer({preTs, normTs}: TsData) {
     if (answers.length < 1) {
         console.log("[Bunpro.inputAnswer] matched t=%s, but failed to find answers again", transcript);
     }
-    const studyAreaInput = document.getElementById("study-answer-input");
+    const studyAreaInput = document.getElementById('manual-input');
     if (studyAreaInput !== null) {
         (studyAreaInput as HTMLInputElement).value = answers[0];
         clickNext();
     } else {
-        console.log("[Bunpro.inputAnswer] studyAreaInput was null");
+        console.log("[Bunpro.inputAnswer] #manual-input was null");
     }
 }
 
