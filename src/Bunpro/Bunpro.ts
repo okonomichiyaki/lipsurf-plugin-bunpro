@@ -6,7 +6,7 @@ declare const PluginBase: IPluginBase;
 // stores the previous language before we started Bunpro context
 var previousLanguage: LanguageCode;
 
-const BUNPRO_HREF_REGX = /^https?:\/\/(www\.)?bunpro\.jp\/(learn|study|cram)/;
+const BUNPRO_HREF_REGX = /^https?:\/\/(www\.)?bunpro\.jp\/(reviews|cram|learn).*/;
 
 const particles: { [key: string]: string } = {
     "もう":"も",
@@ -99,6 +99,27 @@ export function matchAnswer({preTs, normTs}: TsData): [number, number, any[]?]|u
     return undefined;
 }
 
+function getButtonWithTitle(title) {
+  const buttons = document.querySelectorAll('#js-quiz button');
+  if (buttons.length === 0) {
+    console.error("[Bunpro.getBlankButton] fatal error, no buttons found for query `#js-quiz button`");
+    return null;
+  }
+  const expected = Array.from(buttons).filter(b => b.title === title)
+  if (expected.length === 0) {
+    console.error(`[Bunpro.getBlankButton] fatal error, no buttons found with title ${title}`);
+    return null;
+  }
+  return expected[0];
+}
+
+function clickButtonWithTitle(title) {
+  const button = getButtonWithTitle(title);
+  if (button) {
+    button.click();
+  }
+}
+
 function inputAnswer({preTs, normTs}: TsData) {
     let transcript = normTs;
     // assumes that we matched a correct answer, so input the first answer from the page:
@@ -106,13 +127,23 @@ function inputAnswer({preTs, normTs}: TsData) {
     if (answers.length < 1) {
         console.log("[Bunpro.inputAnswer] matched t=%s, but failed to find answers again", transcript);
     }
-    const studyAreaInput = document.getElementById('manual-input');
-    if (studyAreaInput !== null) {
-        (studyAreaInput as HTMLInputElement).value = answers[0];
-        clickNext();
-    } else {
-        console.log("[Bunpro.inputAnswer] #manual-input was null");
+  const answer = answers[0];
+
+  const inputEl = document.querySelector(".InputManual__input");
+  const event = new Event("input", { bubbles: true });
+  inputEl.value = answer;
+  inputEl.dispatchEvent(event);
+
+  // Wait for React before clicking to submit answer
+  setTimeout(() => {
+    const submitButton = document.querySelector(".InputManual__button");
+    submitButton.click();
+
+    // If lightning mode is on, wait then click next
+    if (PluginBase.getPluginOption('Bunpro', 'Lightning mode') === true) {
+      setTimeout(clickNext, 100);
     }
+  }, 50);
 }
 
 function markWrong() {
@@ -146,7 +177,7 @@ function clickElement(selector: string) {
 // or backspace
 
 function clickNext() {
-    clickElement("#submit-study-answer");
+  clickButtonWithTitle('Next question');
 }
 
 function clickHint() {
@@ -232,6 +263,11 @@ export default <IPluginBase & IPlugin> {...PluginBase, ...{
             name: 'Automatically show answer',
             type: 'boolean',
             default: true,
+        },
+        {
+          name: 'Lightning mode',
+          type: 'boolean',
+          default: true,
         }
     ],
     commands: [
