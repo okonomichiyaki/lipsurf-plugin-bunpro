@@ -1,0 +1,29 @@
+plugin for LipSurf to enable hands-free reviews on Bunpro
+⚠️ currently non-functional waiting for further changes / support from Bunpro ⚠️
+
+relies on support implemented by the Bunpro developers:
+
+> There is now an element on the page with ID "quiz-metadata-element"
+> Details are:
+
+```
+<div
+  id="quiz-metadata-element"
+  data-meta-location="review"
+  data-meta-input-mode="manual"
+  data-meta-question-mode="cloze"
+  data-meta-answers-array="['だ','です']"
+  aria-hidden="true"
+></div>
+```
+
+> where:
+
+```
+data-meta-location: "review" | "learn"
+data-meta-input-mode: "manual" | "flashcard";
+data-meta-question-mode: "cloze" | "translate";
+data-meta-answers-array: string; // A JSON stringified array of strings of either Japanese or English (depending on input language)
+```
+
+> Please note that the anser language can change and there can be multiple items in the array.
