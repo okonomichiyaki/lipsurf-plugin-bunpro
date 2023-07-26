@@ -217,11 +217,23 @@ window.allPlugins.Bunpro = (() => {
   function clickShowGrammar() {
     clickElement("#show-grammar");
   }
+  function mutationCallback(mutations, observer) {
+    const meta = document.querySelectorAll("#quiz-metadata-element");
+    if (meta && meta.length > 0 && meta[0].getAttribute("data-meta-question-mode") === "translate") {
+      PluginBase.util.setLanguage("en");
+    } else {
+      PluginBase.util.setLanguage("ja");
+    }
+  }
   function enterBunproContext() {
     console.log("[Bunpro.enterBunproContext]");
     previousLanguage = PluginBase.util.getLanguage();
     PluginBase.util.enterContext(["Bunpro"]);
     PluginBase.util.setLanguage("ja");
+    const config = { attributes: true, childList: true, subtree: true };
+    const observer = new MutationObserver(mutationCallback);
+    observer.observe(document.body, config);
+    mutationCallback(null, null);
   }
   function exitBunproContext() {
     console.log("[Bunpro.exitBunproContext]");
@@ -469,11 +481,23 @@ window.allPlugins.Bunpro = (() => {
   function clickShowGrammar() {
     clickElement("#show-grammar");
   }
+  function mutationCallback(mutations, observer) {
+    const meta = document.querySelectorAll("#quiz-metadata-element");
+    if (meta && meta.length > 0 && meta[0].getAttribute("data-meta-question-mode") === "translate") {
+      PluginBase.util.setLanguage("en");
+    } else {
+      PluginBase.util.setLanguage("ja");
+    }
+  }
   function enterBunproContext() {
     console.log("[Bunpro.enterBunproContext]");
     previousLanguage = PluginBase.util.getLanguage();
     PluginBase.util.enterContext(["Bunpro"]);
     PluginBase.util.setLanguage("ja");
+    const config = { attributes: true, childList: true, subtree: true };
+    const observer = new MutationObserver(mutationCallback);
+    observer.observe(document.body, config);
+    mutationCallback(null, null);
   }
   function exitBunproContext() {
     console.log("[Bunpro.exitBunproContext]");
