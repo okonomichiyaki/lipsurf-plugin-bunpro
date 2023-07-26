@@ -217,7 +217,7 @@ export default <IPluginBase & IPlugin> {...PluginBase, ...{
     description: "",
     match: /.*bunpro.jp.*/,
     apiVersion: 2,
-    version: "0.0.5",
+    version: "0.0.6",
     init: () => {
         window.addEventListener("blur", activeElChange, true);
         previousLanguage = PluginBase.util.getLanguage();
