@@ -169,6 +169,14 @@ window.allPlugins.Bunpro = (() => {
       button.click();
     }
   }
+  function clickSpanContaining(text) {
+    const buttons = Array.from(document.querySelectorAll("button > span")).filter((n) => n.innerText === text);
+    if (buttons.length > 0) {
+      buttons[0].click();
+    } else {
+      console.log("[Bunpro.clickSpanContaining] could not find span containing text", text);
+    }
+  }
   function inputAnswer({ preTs, normTs }) {
     let transcript = normTs;
     const answers = getAnswers();
@@ -189,41 +197,42 @@ window.allPlugins.Bunpro = (() => {
     }, 50);
   }
   function markWrong() {
-    const studyAreaInput = document.getElementById("study-answer-input");
-    if (studyAreaInput !== null) {
-      studyAreaInput.value = "あああ";
-      clickNext();
-    } else {
-      console.log("[Bunpro.markWrong] studyAreaInput was null");
-    }
-    if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
-      clickElement("#show-answer");
-    }
-  }
-  function clickElement(selector) {
-    const element = document.querySelector(selector);
-    if (element !== null) {
-      element.click();
-    } else {
-      console.log("[Bunpro.clickElement] %s was null", selector);
-    }
+    const inputEl = document.querySelector(".InputManual__input");
+    const event = new Event("input", { bubbles: true });
+    const junk = getLanguage() === "ja" ? "あああ" : "aaa";
+    inputEl.value = junk;
+    inputEl.dispatchEvent(event);
+    setTimeout(() => {
+      const submitButton = document.querySelector(".InputManual__button");
+      submitButton.click();
+      if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
+        setTimeout(clickShowAnswer, 100);
+      }
+    }, 50);
   }
   function clickNext() {
     clickButtonWithTitle("Next question");
   }
   function clickHint() {
-    clickElement("#show-english-hint");
+    clickButtonWithTitle("Toggle the hint level");
   }
   function clickShowGrammar() {
-    clickElement("#show-grammar");
+    clickSpanContaining("Show Info");
   }
-  function mutationCallback(mutations, observer) {
+  function clickShowAnswer() {
+    clickSpanContaining("See Answer");
+  }
+  function getLanguage() {
     const meta = document.querySelectorAll("#quiz-metadata-element");
     if (meta && meta.length > 0 && meta[0].getAttribute("data-meta-question-mode") === "translate") {
-      PluginBase.util.setLanguage("en");
+      return "en";
     } else {
-      PluginBase.util.setLanguage("ja");
+      return "ja";
     }
+  }
+  function mutationCallback(mutations, observer) {
+    const lang = getLanguage();
+    PluginBase.util.setLanguage(lang);
   }
   function enterBunproContext() {
     console.log("[Bunpro.enterBunproContext]");
@@ -317,22 +326,24 @@ window.allPlugins.Bunpro = (() => {
       }
     }, 50);
   } }, "Hint": { "pageFn": function clickHint2() {
-    clickElement("#show-english-hint");
+    clickButtonWithTitle("Toggle the hint level");
   } }, "Next": { "pageFn": function clickNext2() {
     clickButtonWithTitle("Next question");
   } }, "Wrong": { "pageFn": function markWrong2() {
-    const studyAreaInput = document.getElementById("study-answer-input");
-    if (studyAreaInput !== null) {
-      studyAreaInput.value = "あああ";
-      clickNext();
-    } else {
-      console.log("[Bunpro.markWrong] studyAreaInput was null");
-    }
-    if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
-      clickElement("#show-answer");
-    }
+    const inputEl = document.querySelector(".InputManual__input");
+    const event = new Event("input", { bubbles: true });
+    const junk = getLanguage() === "ja" ? "あああ" : "aaa";
+    inputEl.value = junk;
+    inputEl.dispatchEvent(event);
+    setTimeout(() => {
+      const submitButton = document.querySelector(".InputManual__button");
+      submitButton.click();
+      if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
+        setTimeout(clickShowAnswer, 100);
+      }
+    }, 50);
   } }, "Info": { "pageFn": function clickShowGrammar2() {
-    clickElement("#show-grammar");
+    clickSpanContaining("Show Info");
   } } } } };
   Bunpro_default.languages.ja = { niceName: "Bunpro", description: "Bunpro", commands: { "Answer": { name: "答え (answer)", match: { description: "[Bunproの答え]", fn: matchAnswer } }, "Hint": { name: "暗示 (hint)", match: ["ひんと", "あんじ"] }, "Next": { name: "次へ (next)", match: ["つぎ", "ねくすと", "ていしゅつ", "すすむ", "ちぇっく"] }, "Wrong": { name: "バツ (wrong)", match: ["だめ", "ばつ"] }, "Info": { name: "情報 (info)", match: ["じょうほう"] } } };
   return Bunpro_default;
@@ -433,6 +444,14 @@ window.allPlugins.Bunpro = (() => {
       button.click();
     }
   }
+  function clickSpanContaining(text) {
+    const buttons = Array.from(document.querySelectorAll("button > span")).filter((n) => n.innerText === text);
+    if (buttons.length > 0) {
+      buttons[0].click();
+    } else {
+      console.log("[Bunpro.clickSpanContaining] could not find span containing text", text);
+    }
+  }
   function inputAnswer({ preTs, normTs }) {
     let transcript = normTs;
     const answers = getAnswers();
@@ -453,41 +472,42 @@ window.allPlugins.Bunpro = (() => {
     }, 50);
   }
   function markWrong() {
-    const studyAreaInput = document.getElementById("study-answer-input");
-    if (studyAreaInput !== null) {
-      studyAreaInput.value = "あああ";
-      clickNext();
-    } else {
-      console.log("[Bunpro.markWrong] studyAreaInput was null");
-    }
-    if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
-      clickElement("#show-answer");
-    }
-  }
-  function clickElement(selector) {
-    const element = document.querySelector(selector);
-    if (element !== null) {
-      element.click();
-    } else {
-      console.log("[Bunpro.clickElement] %s was null", selector);
-    }
+    const inputEl = document.querySelector(".InputManual__input");
+    const event = new Event("input", { bubbles: true });
+    const junk = getLanguage() === "ja" ? "あああ" : "aaa";
+    inputEl.value = junk;
+    inputEl.dispatchEvent(event);
+    setTimeout(() => {
+      const submitButton = document.querySelector(".InputManual__button");
+      submitButton.click();
+      if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
+        setTimeout(clickShowAnswer, 100);
+      }
+    }, 50);
   }
   function clickNext() {
     clickButtonWithTitle("Next question");
   }
   function clickHint() {
-    clickElement("#show-english-hint");
+    clickButtonWithTitle("Toggle the hint level");
   }
   function clickShowGrammar() {
-    clickElement("#show-grammar");
+    clickSpanContaining("Show Info");
   }
-  function mutationCallback(mutations, observer) {
+  function clickShowAnswer() {
+    clickSpanContaining("See Answer");
+  }
+  function getLanguage() {
     const meta = document.querySelectorAll("#quiz-metadata-element");
     if (meta && meta.length > 0 && meta[0].getAttribute("data-meta-question-mode") === "translate") {
-      PluginBase.util.setLanguage("en");
+      return "en";
     } else {
-      PluginBase.util.setLanguage("ja");
+      return "ja";
     }
+  }
+  function mutationCallback(mutations, observer) {
+    const lang = getLanguage();
+    PluginBase.util.setLanguage(lang);
   }
   function enterBunproContext() {
     console.log("[Bunpro.enterBunproContext]");

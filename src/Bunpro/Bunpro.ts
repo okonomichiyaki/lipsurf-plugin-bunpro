@@ -120,6 +120,15 @@ function clickButtonWithTitle(title) {
   }
 }
 
+function clickSpanContaining(text) {
+  const buttons = Array.from(document.querySelectorAll('button > span')).filter(n => n.innerText === text);
+  if (buttons.length > 0) {
+    buttons[0].click();
+  } else {
+    console.log("[Bunpro.clickSpanContaining] could not find span containing text", text)
+  }
+}
+
 function inputAnswer({preTs, normTs}: TsData) {
     let transcript = normTs;
     // assumes that we matched a correct answer, so input the first answer from the page:
@@ -147,16 +156,20 @@ function inputAnswer({preTs, normTs}: TsData) {
 }
 
 function markWrong() {
-    const studyAreaInput = document.getElementById("study-answer-input");
-    if (studyAreaInput !== null) {
-        (studyAreaInput as HTMLInputElement).value = "あああ";
-        clickNext();
-    } else {
-        console.log("[Bunpro.markWrong] studyAreaInput was null");
+  const inputEl = document.querySelector(".InputManual__input");
+  const event = new Event("input", { bubbles: true });
+  const junk = getLanguage() === "ja" ? 'あああ' : 'aaa';
+  inputEl.value = junk;
+  inputEl.dispatchEvent(event);
+
+  // Wait for React before clicking to submit answer
+  setTimeout(() => {
+    const submitButton = document.querySelector(".InputManual__button");
+    submitButton.click();
+    if (PluginBase.getPluginOption("Bunpro", "Automatically show answer") === true) {
+      setTimeout(clickShowAnswer, 100);
     }
-    if (PluginBase.getPluginOption('Bunpro', 'Automatically show answer') === true) {
-        clickElement('#show-answer');
-    }
+  }, 50);
 }
 
 function clickElement(selector: string) {
@@ -181,24 +194,32 @@ function clickNext() {
 }
 
 function clickHint() {
-    clickElement("#show-english-hint");
+  clickButtonWithTitle('Toggle the hint level');
 }
 
 function clickShowGrammar() {
-    clickElement("#show-grammar");
+  clickSpanContaining('Show Info');
 }
 
+function clickShowAnswer() {
+  clickSpanContaining('See Answer');
+}
+
+function getLanguage() {
+  const meta = document.querySelectorAll('#quiz-metadata-element');
+  if (meta && meta.length > 0 && meta[0].getAttribute('data-meta-question-mode') === 'translate') {
+    return "en";
+  } else {
+    return "ja";
+  }
+}
 
 /**
  * Watches the page in order to set the language for each card
  */
 function mutationCallback(mutations, observer) {
-  const meta = document.querySelectorAll('#quiz-metadata-element');
-  if (meta && meta.length > 0 && meta[0].getAttribute('data-meta-question-mode') === 'translate') {
-    PluginBase.util.setLanguage("en");
-  } else {
-    PluginBase.util.setLanguage("ja");
-  }
+  const lang = getLanguage();
+  PluginBase.util.setLanguage(lang);
 }
 
 function enterBunproContext() {
@@ -249,7 +270,7 @@ export default <IPluginBase & IPlugin> {...PluginBase, ...{
             window.dispatchEvent(new Event('locationchange'));
             return ret;
         })(history.replaceState);`
-        var head = document.getElementsByTagName("head")[0];         
+        var head = document.getElementsByTagName("head")[0];
         var script = document.createElement('script');
         script.type = 'text/javascript';
         script.innerHTML = src;
